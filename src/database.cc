@@ -43,6 +43,12 @@ rocksdb::Status Database::OpenDatabase (
   return rocksdb::DB::Open(*options, **location, &db);
 }
 
+rocksdb::Status Database::OpenForReadOnlyDatabase (
+        rocksdb::Options* options
+    ) {
+  return rocksdb::DB::OpenForReadOnly(*options, **location, &db);
+}
+
 rocksdb::Status Database::PutToDatabase (
         rocksdb::WriteOptions* options
       , rocksdb::Slice key
@@ -189,6 +195,7 @@ NAN_METHOD(Database::Open) {
   bool createIfMissing = BooleanOptionValue(optionsObj, "createIfMissing", true);
   bool errorIfExists = BooleanOptionValue(optionsObj, "errorIfExists");
   bool compression = BooleanOptionValue(optionsObj, "compression", true);
+  bool readOnly = BooleanOptionValue(optionsObj, "readOnly", false);
 
   uint32_t cacheSize = UInt32OptionValue(optionsObj, "cacheSize", 8 << 20);
   uint32_t writeBufferSize = UInt32OptionValue(
@@ -217,6 +224,7 @@ NAN_METHOD(Database::Open) {
     , createIfMissing
     , errorIfExists
     , compression
+    , readOnly
     , writeBufferSize
     , blockSize
     , maxOpenFiles

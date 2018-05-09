@@ -36,6 +36,7 @@ OpenWorker::OpenWorker (
   , bool createIfMissing
   , bool errorIfExists
   , bool compression
+  , bool readOnly
   , uint32_t writeBufferSize
   , uint32_t blockSize
   , uint32_t maxOpenFiles
@@ -44,6 +45,8 @@ OpenWorker::OpenWorker (
 ) : AsyncWorker(database, callback)
 {
   rocksdb::LevelDBOptions levelOptions;
+
+  this->readOnly = readOnly;
 
   if (blockCache != NULL) {
     levelOptions.block_cache = blockCache.get();
@@ -90,7 +93,11 @@ OpenWorker::~OpenWorker () {
 }
 
 void OpenWorker::Execute () {
-  SetStatus(database->OpenDatabase(options));
+  if (readOnly == true) {
+      SetStatus(database->OpenForReadOnlyDatabase(options));
+  } else {
+      SetStatus(database->OpenDatabase(options));
+  }
 }
 
 /** CLOSE WORKER **/

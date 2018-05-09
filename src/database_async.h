@@ -25,6 +25,7 @@ public:
     , bool createIfMissing
     , bool errorIfExists
     , bool compression
+    , bool readOnly
     , uint32_t writeBufferSize
     , uint32_t blockSize
     , uint32_t maxOpenFiles
@@ -37,6 +38,7 @@ public:
 
 private:
   rocksdb::Options* options;
+  bool readOnly;
 };
 
 class CloseWorker : public AsyncWorker {
